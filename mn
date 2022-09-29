@@ -1,0 +1,148 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+typedef struct {
+   char patente[6];
+   int valor;
+   char marca[10];
+} automovil;
+
+typedef struct nodoAuto
+{
+   automovil dato;
+   struct nodoAuto * sig;
+} nodoAuto;
+
+
+///Prototipados
+nodoAuto* crearNodo (automovil dato);
+void agregarAlFinal (nodoAuto** lista, nodoAuto * nuevo);
+int insertarCelda(automovil A [ ], automovil dato, int validos);
+void agregarMuchos(nodoAuto * * lista);
+int pasar(nodoAuto * lista, automovil autom[ ]);
+void mostrarAutomovil (automovil autom);
+void mostrarArregloRecursivo(automovil autom[ ], int i, int pos);
+int sumarPar (nodoAuto* lista);
+
+int main()
+{
+    int validos = 0;
+    //int suma = 0;
+    automovil autom [20];
+    nodoAuto* lista = NULL;
+    agregarMuchos(&lista);
+    validos= pasar(lista, autom);
+    mostrarArregloRecursivo(autom,0, validos-1);
+    printf("Suma= %d", sumarPar(lista));
+    return 0;
+}
+
+nodoAuto * crearNodo (automovil dato)
+{
+    nodoAuto* nuevo = (nodoAuto*)malloc(sizeof(nodoAuto));
+    nuevo->dato = dato;
+    nuevo->sig = NULL;
+    return nuevo;
+}
+void agregarAlFinal (nodoAuto** lista, nodoAuto * nuevo)
+{
+    nodoAuto* aux;
+    if (*lista == NULL)
+    {
+        *lista = nuevo;
+    }
+    else
+    {
+        aux=*lista;
+        while (aux->sig!=NULL)
+        {
+            aux = aux->sig;
+        }
+        aux->sig = nuevo;
+    }
+}
+int insertarCelda(automovil autom [ ], automovil dato, int validos)
+{
+    if (validos == 0)
+    {
+        autom[validos]=dato;
+    }
+    else
+    {
+        int i = validos-1;
+        while ( i>=0 && dato.valor > autom[i].valor)
+        {
+            autom[i+1] = autom[i];
+            i--;
+        }
+        autom[i+1]=dato;
+    }
+    return validos+1;
+}
+void agregarMuchos(nodoAuto** lista)
+{
+    char seguir = 's';
+    automovil autom;
+    nodoAuto* nuevo;
+    do
+    {
+        printf("Ingrese datos de automovil\n");
+        printf("Ingrese patente\n");
+        fflush(stdin);
+        gets(autom.patente);
+        printf("Ingrese marca\n");
+        fflush(stdin);
+        gets(autom.marca);
+        printf("Ingrese valor\n");
+        scanf("%d", &autom.valor);
+        nuevo = crearNodo(autom);
+        agregarAlFinal(lista, nuevo);
+        printf("Desea seguir? (s-n)");
+        fflush(stdin);
+        scanf("%c", &seguir);
+    }while (seguir =='s');
+}
+int pasar(nodoAuto * lista, automovil autom[ ])
+{
+    int validos= 0;
+    while (lista!= NULL)
+    {
+        validos=insertarCelda(autom,lista->dato, validos);
+        lista=lista->sig;
+    }
+    return validos;
+}
+void mostrarAutomovil (automovil autom)
+{
+    printf("Patente: %s\n", autom.patente);
+    printf("Marca: %s\n", autom.marca);
+    printf("Valor: %d\n", autom.valor);
+}
+void mostrarArregloRecursivo(automovil autom[ ], int i, int pos)
+{
+    if (i<=pos)
+    {
+        mostrarAutomovil (autom[i]);
+        mostrarArregloRecursivo(autom, i+1, pos);
+    }
+}
+int sumarPar (nodoAuto* lista)
+{
+    int num;
+    if (lista!=NULL)
+    {
+        num= (int)lista->dato.patente[5];
+        if(num %2 == 0)
+        {
+            return lista->dato.valor + sumarPar(lista->sig);
+        }
+        else
+        {
+            return sumarPar(lista->sig);
+        }
+    }
+    else
+    {
+        return 0;
+    }
+}
